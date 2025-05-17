@@ -7,7 +7,7 @@ def stream_users_in_batches(batch_size):
     connection = mysql.connector.connect(
         host='localhost',
         user='root',
-        password='password',  
+        password='your_password',  # 🔁 Replace this with your actual MySQL password
         database='ALX_prodev'
     )
     cursor = connection.cursor(dictionary=True)
@@ -17,7 +17,7 @@ def stream_users_in_batches(batch_size):
         batch = cursor.fetchmany(batch_size)
         if not batch:
             break
-        yield batch
+        yield batch  # ✅ Yield each batch (not return)
 
     cursor.close()
     connection.close()
