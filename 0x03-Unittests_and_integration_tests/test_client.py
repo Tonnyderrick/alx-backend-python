@@ -1,17 +1,12 @@
 #!/usr/bin/env python3
-"""
-Unit test for GithubOrgClient.org
-"""
-
 import unittest
 from unittest.mock import patch
 from parameterized import parameterized
 
 from client import GithubOrgClient
 
-
 class TestGithubOrgClient(unittest.TestCase):
-    """Test case for GithubOrgClient"""
+    """Tests for GithubOrgClient"""
 
     @parameterized.expand([
         ("google",),
@@ -19,16 +14,13 @@ class TestGithubOrgClient(unittest.TestCase):
     ])
     @patch("client.get_json")
     def test_org(self, org_name, mock_get_json):
-        """Test that GithubOrgClient.org returns the correct value"""
-        test_payload = {"login": org_name}
-        mock_get_json.return_value = test_payload
+        """Test that GithubOrgClient.org returns correct payload"""
+        mock_response = {"login": org_name}
+        mock_get_json.return_value = mock_response
 
         client = GithubOrgClient(org_name)
-        result = client.org
-
-        self.assertEqual(result, test_payload)
+        self.assertEqual(client.org, mock_response)
         mock_get_json.assert_called_once_with(f"https://api.github.com/orgs/{org_name}")
-
 
 if __name__ == "__main__":
     unittest.main()
