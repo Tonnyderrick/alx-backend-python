@@ -1,14 +1,15 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
-from rest_framework.decorators import action
+from django.shortcuts import get_object_or_404
+
 from .models import Conversation, Message, CustomUser
 from .serializers import ConversationSerializer, MessageSerializer
-from django.shortcuts import get_object_or_404
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
+    filter_backends = [filters.OrderingFilter]
 
     def create(self, request, *args, **kwargs):
         user_ids = request.data.get('user_ids', [])
@@ -25,6 +26,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
+    filter_backends = [filters.OrderingFilter]
 
     def create(self, request, *args, **kwargs):
         conversation_id = request.data.get('conversation_id')
