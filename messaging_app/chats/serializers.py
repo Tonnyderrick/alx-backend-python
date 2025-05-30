@@ -3,6 +3,12 @@ from .models import CustomUser, Conversation, Message
 
 
 class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField()
+    email = serializers.CharField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    phone_number = serializers.CharField()
+
     class Meta:
         model = CustomUser
         fields = [
@@ -16,13 +22,18 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    sender = UserSerializer(read_only=True)
+    sender_username = serializers.SerializerMethodField()
+    message_body = serializers.CharField()
+    sent_at = serializers.DateTimeField()
+
+    def get_sender_username(self, obj):
+        return obj.sender.username
 
     class Meta:
         model = Message
         fields = [
             'message_id',
-            'sender',
+            'sender_username',
             'message_body',
             'sent_at',
         ]
@@ -30,7 +41,10 @@ class MessageSerializer(serializers.ModelSerializer):
 
 class ConversationSerializer(serializers.ModelSerializer):
     participants = UserSerializer(many=True, read_only=True)
-    messages = MessageSerializer(many=True, read_only=True, source='messages')
+    messages = serializers.SerializerMethodField()
+
+    def get_messages(self, obj):
+        return MessageSerializer(obj.messages.all(), many=True).data
 
     class Meta:
         model = Conversation
@@ -40,3 +54,12 @@ class ConversationSerializer(serializers.ModelSerializer):
             'created_at',
             'messages',
         ]
+
+
+class DummySerializer(serializers.Serializer):
+    some_field = serializers.CharField()
+
+    def validate_some_field(self, value):
+        if not value.isalpha():
+            raise serializers.ValidationError("Only alphabetic characters allowed.")
+        return value
