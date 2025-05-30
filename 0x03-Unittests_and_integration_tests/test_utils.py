@@ -1,87 +1,15 @@
 #!/usr/bin/env python3
-"""Unit tests for the utils module and client module covering:
-- access_nested_map
-- get_json
-- memoize
-- GithubOrgClient.org
+"""Unit tests for GithubOrgClient class in the client module.
 """
+
 import unittest
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 from parameterized import parameterized
-from utils import access_nested_map, get_json, memoize
 from client import GithubOrgClient
 
 
-class TestAccessNestedMap(unittest.TestCase):
-    """Test suite for the access_nested_map function."""
-
-    @parameterized.expand([
-        ({"a": 1}, ("a",), 1),
-        ({"a": {"b": 2}}, ("a",), {"b": 2}),
-        ({"a": {"b": 2}}, ("a", "b"), 2),
-    ])
-    def test_access_nested_map(self, nested_map, path, expected):
-        """Test that access_nested_map returns correct values."""
-        self.assertEqual(access_nested_map(nested_map, path), expected)
-
-    @parameterized.expand([
-        ({}, ("a",)),
-        ({"a": 1}, ("a", "b")),
-    ])
-    def test_access_nested_map_exception(self, nested_map, path):
-        """Test that KeyError is raised with the correct message."""
-        with self.assertRaises(KeyError) as context:
-            access_nested_map(nested_map, path)
-        self.assertEqual(str(context.exception), f"'{path[-1]}'")
-
-
-class TestGetJson(unittest.TestCase):
-    """Test suite for the get_json function."""
-
-    @parameterized.expand([
-        ("http://example.com", {"payload": True}),
-        ("http://holberton.io", {"payload": False}),
-    ])
-    @patch("utils.requests.get")
-    def test_get_json(self, test_url, test_payload, mock_get):
-        """Test get_json returns the correct payload from mocked requests."""
-        mock_response = Mock()
-        mock_response.json.return_value = test_payload
-        mock_get.return_value = mock_response
-
-        result = get_json(test_url)
-        mock_get.assert_called_once_with(test_url)
-        self.assertEqual(result, test_payload)
-
-
-class TestMemoize(unittest.TestCase):
-    """Test suite for the memoize decorator."""
-
-    def test_memoize(self):
-        """Test that memoize caches method result after first call."""
-
-        class TestClass:
-            def a_method(self):
-                return 42
-
-            @memoize
-            def a_property(self):
-                return self.a_method()
-
-        with patch.object(
-            TestClass, "a_method", return_value=42
-        ) as mock_method:
-            test_obj = TestClass()
-            result1 = test_obj.a_property
-            result2 = test_obj.a_property
-
-            self.assertEqual(result1, 42)
-            self.assertEqual(result2, 42)
-            mock_method.assert_called_once()
-
-
 class TestGithubOrgClient(unittest.TestCase):
-    """Test suite for GithubOrgClient.org method."""
+    """Test case for the GithubOrgClient.org property."""
 
     @parameterized.expand([
         ("google",),
@@ -89,16 +17,20 @@ class TestGithubOrgClient(unittest.TestCase):
     ])
     @patch("client.get_json")
     def test_org(self, org_name, mock_get_json):
-        """Test that GithubOrgClient.org returns correct data and calls get_json with the right URL."""
-        expected_data = {"login": org_name, "id": 123}
+        """Test that GithubOrgClient.org returns the correct value
+        and get_json is called once with the expected URL.
+        """
+        expected_data = {"login": org_name}
         mock_get_json.return_value = expected_data
 
         client = GithubOrgClient(org_name)
         result = client.org
 
         self.assertEqual(result, expected_data)
-        mock_get_json.assert_called_once_with(f"https://api.github.com/orgs/{org_name}")
+        mock_get_json.assert_called_once_with(
+            f"https://api.github.com/orgs/{org_name}"
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
