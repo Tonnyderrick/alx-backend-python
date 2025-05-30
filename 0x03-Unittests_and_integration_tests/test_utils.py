@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+"""Unit tests for the utils module covering access_nested_map, get_json,
+and memoize.
+"""
 
 import unittest
 from unittest.mock import patch, Mock
@@ -15,6 +18,7 @@ class TestAccessNestedMap(unittest.TestCase):
         ({"a": {"b": 2}}, ("a", "b"), 2),
     ])
     def test_access_nested_map(self, nested_map, path, expected):
+        """Test that access_nested_map returns correct values."""
         self.assertEqual(access_nested_map(nested_map, path), expected)
 
     @parameterized.expand([
@@ -22,6 +26,7 @@ class TestAccessNestedMap(unittest.TestCase):
         ({"a": 1}, ("a", "b")),
     ])
     def test_access_nested_map_exception(self, nested_map, path):
+        """Test that KeyError is raised with the correct message."""
         with self.assertRaises(KeyError) as context:
             access_nested_map(nested_map, path)
         self.assertEqual(str(context.exception), f"'{path[-1]}'")
@@ -36,6 +41,7 @@ class TestGetJson(unittest.TestCase):
     ])
     @patch("utils.requests.get")
     def test_get_json(self, test_url, test_payload, mock_get):
+        """Test get_json returns the correct payload from mocked requests."""
         mock_response = Mock()
         mock_response.json.return_value = test_payload
         mock_get.return_value = mock_response
@@ -64,11 +70,8 @@ class TestMemoize(unittest.TestCase):
             result1 = test_obj.a_property
             result2 = test_obj.a_property
 
-            # Check return value
             self.assertEqual(result1, 42)
             self.assertEqual(result2, 42)
-
-            # Check a_method was only called once
             mock_method.assert_called_once()
 
 
