@@ -1,6 +1,7 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.response import Response
 from .models import Message, Conversation
 from .serializers import MessageSerializer, ConversationSerializer
 from .permissions import IsParticipantOfConversation
@@ -21,10 +22,22 @@ class MessageViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsParticipantOfConversation]
 
     def get_queryset(self):
-        return self.queryset.filter(conversation__participants=self.request.user)
+        return Message.objects.filter(conversation__participants=self.request.user)
 
     def perform_create(self, serializer):
-        conversation = serializer.validated_data['conversation']
+        conversation = serializer.validated_data.get('conversation')
         if self.request.user not in conversation.participants.all():
-            raise PermissionDenied("You are not a participant in this conversation.")
+            raise PermissionDenied(detail="You are not a participant in this conversation.")
         serializer.save(sender=self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        message = self.get_object()
+        if request.user not in message.conversation.participants.all():
+            return Response({"detail": "Forbidden"}, status=status.HTTP_403_FORBIDDEN)
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        message = self.get_object()
+        if request.user not in message.conversation.participants.all():
+            return Response({"detail": "Forbidden"}, status=status.HTTP_403_FORBIDDEN)
+        return super().destroy(request, *args, **kwargs)
