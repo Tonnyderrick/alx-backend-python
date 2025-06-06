@@ -22,6 +22,12 @@ class MessageViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsParticipantOfConversation]
 
     def get_queryset(self):
+        conversation_id = self.request.query_params.get('conversation_id')
+        if conversation_id:
+            return Message.objects.filter(
+                conversation__id=conversation_id,
+                conversation__participants=self.request.user
+            )
         return Message.objects.filter(conversation__participants=self.request.user)
 
     def perform_create(self, serializer):
