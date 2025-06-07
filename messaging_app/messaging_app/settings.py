@@ -145,6 +145,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'chats.pagination.StandardResultsSetPagination',
     'PAGE_SIZE': 20,
 }
+from rest_framework.pagination import PageNumberPagination
 
 
 # Simple JWT token lifetime settings

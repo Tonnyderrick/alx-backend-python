@@ -1,17 +1,14 @@
-# chats/pagination.py
+import django_filters
+from .models import Message
+from django.contrib.auth import get_user_model
 
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.response import Response
+User = get_user_model()
 
-class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 20
-    page_size_query_param = 'page_size'
-    max_page_size = 100
+class MessageFilter(django_filters.FilterSet):
+    sender = django_filters.ModelChoiceFilter(queryset=User.objects.all())
+    timestamp__gte = django_filters.DateTimeFilter(field_name='timestamp', lookup_expr='gte')
+    timestamp__lte = django_filters.DateTimeFilter(field_name='timestamp', lookup_expr='lte')
 
-    def get_paginated_response(self, data):
-        return Response({
-            'count': self.page.paginator.count,
-            'next': self.get_next_link(),
-            'previous': self.get_previous_link(),
-            'results': data
-        })
+    class Meta:
+        model = Message
+        fields = ['sender', 'timestamp__gte', 'timestamp__lte']
