@@ -1,39 +1,41 @@
-from datetime import datetime, time
-import logging
+import time
 from django.http import HttpResponseForbidden
 
-class RequestLoggingMiddleware:
+class OffensiveLanguageMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
-        # Set up the logger
-        self.logger = logging.getLogger('request_logger')
-        handler = logging.FileHandler('requests.log')
-        formatter = logging.Formatter('%(message)s')
-        handler.setFormatter(formatter)
-        self.logger.addHandler(handler)
-        self.logger.setLevel(logging.INFO)
+        # Stores IP -> list of timestamps (of POST requests/messages)
+        self.ip_message_times = {}
+
+        # Limits
+        self.MAX_MESSAGES = 5
+        self.TIME_WINDOW = 60  # seconds
 
     def __call__(self, request):
-        user = request.user if request.user.is_authenticated else 'Anonymous'
-        log_message = f"{datetime.now()} - User: {user} - Path: {request.path}"
-        self.logger.info(log_message)
+        if request.method == 'POST':
+            ip = self.get_client_ip(request)
+            now = time.time()
+            message_times = self.ip_message_times.get(ip, [])
+
+            # Keep only timestamps within the TIME_WINDOW (last 60 seconds)
+            message_times = [t for t in message_times if now - t < self.TIME_WINDOW]
+
+            if len(message_times) >= self.MAX_MESSAGES:
+                return HttpResponseForbidden("Message rate limit exceeded. Please wait before sending more messages.")
+
+            # Add current timestamp and update dict
+            message_times.append(now)
+            self.ip_message_times[ip] = message_times
 
         response = self.get_response(request)
         return response
 
-
-class RestrictAccessByTimeMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        now = datetime.now().time()
-        start_block = time(21, 0)  # 9 PM
-        end_block = time(6, 0)     # 6 AM
-
-        # Restrict access between 9 PM and 6 AM
-        if now >= start_block or now <= end_block:
-            return HttpResponseForbidden("Access to chat is restricted between 9 PM and 6 AM")
-
-        response = self.get_response(request)
-        return response
+    def get_client_ip(self, request):
+        """Get client IP address from request headers or remote addr."""
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            # First IP in list is the client IP
+            ip = x_forwarded_for.split(',')[0].strip()
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
