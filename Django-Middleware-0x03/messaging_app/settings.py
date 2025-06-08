@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-1*7qnlgc_stt&pzo#!+kvscttf$6ymjpklxfn6&36jcgqctold'
+SECRET_KEY = 'django-insecure-o3!-hmd7ce&!qc-6br7z5c#wbv08a1i=_!!abn9=*63vdg3h#7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -39,20 +39,18 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'chats',
+    'messaging_app.chats', 
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-
-    # Custom middleware to log user requests
-    'chats.middleware.RequestLoggingMiddleware',
-
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'messaging_app.chats.middleware.RequestLoggingMiddleware',
 ]
 
 ROOT_URLCONF = 'messaging_app.urls'
@@ -122,20 +120,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-# Django REST Framework settings
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-    ],
-}
+AUTH_USER_MODEL = 'chats.User'
