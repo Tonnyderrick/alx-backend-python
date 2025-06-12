@@ -6,7 +6,7 @@ class Message(models.Model):
     receiver = models.ForeignKey(User, related_name='received_messages', on_delete=models.CASCADE)
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
-    edited = models.BooleanField(default=False)  # <-- NEW
+    edited = models.BooleanField(default=False)  # Track if edited
 
     def __str__(self):
         return f"From {self.sender} to {self.receiver} at {self.timestamp}"
@@ -20,10 +20,11 @@ class Notification(models.Model):
     def __str__(self):
         return f"Notification for {self.user} - Message ID: {self.message.id}"
 
-class MessageHistory(models.Model):  # <-- NEW
+class MessageHistory(models.Model):
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name='history')
     old_content = models.TextField()
     edited_at = models.DateTimeField(auto_now_add=True)
+    edited_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)  # <-- NEW
 
     def __str__(self):
-        return f"History of message ID {self.message.id}"
+        return f"History of message ID {self.message.id} edited by {self.edited_by}"
