@@ -25,3 +25,8 @@ def threaded_conversation(request):
      .prefetch_related('replies__sender', 'replies__receiver')
 
     return render(request, 'threaded.html', {'messages': root_messages})
+
+@login_required
+def unread_messages_view(request):
+    unread_messages = Message.unread.for_user(request.user)
+    return render(request, 'unread_messages.html', {'messages': unread_messages})
