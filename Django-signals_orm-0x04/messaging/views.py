@@ -18,6 +18,10 @@ def delete_user(request):
 
 @login_required
 def threaded_conversation(request):
-    root_messages = Message.objects.filter(parent_message=None).select_related('sender', 'receiver')\
-        .prefetch_related('replies__sender', 'replies__receiver')
+    root_messages = Message.objects.filter(
+        sender=request.user,
+        parent_message=None
+    ).select_related('sender', 'receiver')\
+     .prefetch_related('replies__sender', 'replies__receiver')
+
     return render(request, 'threaded.html', {'messages': root_messages})
