@@ -6,7 +6,9 @@ services:
     env_file: .env
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQLDB: ${MYSQLDB}
       MYSQL_USER: ${MYSQL_USER}
+      MYSQLUSER: ${MYSQLUSER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
