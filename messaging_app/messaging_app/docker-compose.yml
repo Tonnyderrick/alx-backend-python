@@ -6,9 +6,8 @@ services:
     env_file: .env
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQLDB: ${MYSQLDB}
+      MYSQL_DB: ${MYSQL_DB}             
       MYSQL_USER: ${MYSQL_USER}
-      MYSQLUSER: ${MYSQLUSER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
@@ -18,8 +17,7 @@ services:
 
   web:
     build: .
-    command: python3 manage.py runserver 0.0.0.0:8000
-
+    command: python3 manage.py runserver 0.0.0.0:8000   
     volumes:
       - .:/app
     ports:
