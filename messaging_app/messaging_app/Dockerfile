@@ -17,5 +17,5 @@ COPY . .
 # Expose the default Django port
 EXPOSE 8000
 
-# Run Django development server
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Run Django development server with explicit -p in CMD
+CMD ["python", "manage.py", "runserver", "-p", "8000", "0.0.0.0:8000"]
