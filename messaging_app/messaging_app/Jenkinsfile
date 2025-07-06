@@ -2,7 +2,12 @@ pipeline {
     agent any
 
     tools {
-        python 'Python 3'  // Make sure this is set in Jenkins (via ShiningPanda or Tool Config)
+        python 'Python 3'
+    }
+
+    environment {
+        DOCKERHUB_USER = 'your-dockerhub-username'
+        IMAGE_NAME = 'messaging_app'
     }
 
     stages {
@@ -29,6 +34,17 @@ pipeline {
         stage('Publish test report') {
             steps {
                 junit 'report.xml'
+            }
+        }
+
+        stage('Build and Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-creds') {
+                        def app = docker.build("${DOCKERHUB_USER}/${IMAGE_NAME}")
+                        app.push("latest")
+                    }
+                }
             }
         }
     }

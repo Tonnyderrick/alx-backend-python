@@ -1,21 +1,22 @@
-# Dockerfile
-
 # Use official Python base image
-FROM python:3.10
+FROM python:3.10-slim
 
-# Set working directory
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# Set work directory
 WORKDIR /app
 
-# Copy requirements and install
+# Install dependencies
 COPY requirements.txt .
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Copy the entire app into the container
+# Copy project
 COPY . .
 
-# Expose the default Django port
+# Expose port 8000
 EXPOSE 8000
 
-# Run Django development server with explicit -p in CMD
-CMD ["python", "manage.py", "runserver", "-p", "8000", "0.0.0.0:8000"]
+# Run the app using gunicorn (make sure it's in requirements.txt)
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "messaging_app.wsgi:application"]
