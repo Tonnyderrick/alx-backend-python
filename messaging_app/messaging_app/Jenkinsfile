@@ -2,21 +2,21 @@ pipeline {
     agent any
 
     tools {
-        python 'Python 3'  
+        python 'Python 3'  // Make sure this is set in Jenkins (via ShiningPanda or Tool Config)
     }
 
     stages {
         stage('Clone repository') {
             steps {
                 git credentialsId: 'github-creds', url: 'https://github.com/Tonnyderrick/alx-backend-python.git', branch: 'main'
-                sh 'git branch'  
+                sh 'git branch'
             }
         }
 
         stage('Install dependencies') {
             steps {
                 sh 'python3 -m venv venv'
-                sh '. venv/bin/activate && pip install -r messaging_app/requirements.txt'
+                sh '. venv/bin/activate && pip3 install -r messaging_app/requirements.txt'
             }
         }
 
