@@ -23,7 +23,20 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    #'chats',  # Include your app name here
+    # 'chats',  # Uncomment this if your app is named "chats"
+]
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # ✅ Your custom middleware
+    'chats.middleware.RequestLoggingMiddleware',
 ]
 
 # DATABASE CONFIGURATION FOR MYSQL USING DOCKER ENV VARIABLES
