@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Unittest module for testing memoization in utils.memoize decorator
+Unittest module for testing memoization in utils.memoize decorator.
 """
 
 import unittest
@@ -9,8 +9,11 @@ from utils import memoize
 
 
 class TestMemoize(unittest.TestCase):
+    """TestCase for memoization functionality in utils.memoize."""
+
     def test_memoize(self):
-        """Test that memoization caches the result of a method call"""
+        """Test that memoization caches the result of a method call."""
+
         class TestClass:
             def a_method(self):
                 return 42
@@ -28,4 +31,5 @@ class TestMemoize(unittest.TestCase):
             self.assertEqual(result1, 42)
             self.assertEqual(result2, 42)
 
+            # This line is likely the too-long one; break it:
             mocked_method.assert_called_once()
