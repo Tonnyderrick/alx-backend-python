@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """ GitHub Org Client """
 
-from typing import Dict
+from typing import Dict, List
 import requests
 
 
@@ -27,3 +27,8 @@ class GithubOrgClient:
     def _public_repos_url(self) -> str:
         """Extract and return public repositories URL"""
         return self.org.get("repos_url")
+
+    def public_repos(self) -> List[str]:
+        """Get list of public repository names"""
+        repos = get_json(self._public_repos_url)
+        return [repo["name"] for repo in repos]
